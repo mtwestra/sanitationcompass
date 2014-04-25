@@ -1,5 +1,5 @@
 {% extends "dst/base_panel.html" %}
-{% load i18n webdesign %}
+{% load i18n %}
 
 
 {% block panel_title %} {{ technology|capfirst }}{% endblock panel_title %}
@@ -9,7 +9,7 @@
 	<div class="span-7 first">
 		<div class="span-2 first" style="float:left;">
 			<div class="back_{{tech.usable}}_img" style="margin-bottom:5px;">
-						<img src="{{ MEDIA_URL}}{{ technology.image }}" />		
+						<img src="/static/small/{{ technology.image }}" />		
 		        </div>
 		</div>
 		<div class="span-4 " style="float:left;">

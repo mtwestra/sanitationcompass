@@ -14,14 +14,14 @@ from datetime import datetime
 from pyPdf import PdfFileWriter, PdfFileReader
 
 from models import Factor, TechGroup, Technology, Relevancy, Answer, Criterion, TechChoice, PDF_prefs
-from utils import pretty_name
+from django.forms.forms import pretty_name
 from pdf_utils import *
 
 # PROFILING  
 import hotshot
 import os
 import time
-import settings
+from django.conf import settings
 
 try:
     PROFILE_LOG_BASE = settings.PROFILE_LOG_BASE
@@ -298,8 +298,10 @@ def technologies(request, model=None, id=None):
 
 def pdf(request, filename):
     logging.debug('------------------------path -----')
-    
-    fullpath = os.path.join(settings.PDF_PATH, filename)
+    print filename
+    #fullpath = os.path.join(settings.PDF_PATH, filename)
+    fullpath = settings.PDF_PATH + filename
+    print fullpath
     logging.debug('------------------------path -----'+fullpath)
     response = HttpResponse(file(fullpath).read())
     response['Content-Type'] = 'application/pdf'
@@ -404,8 +406,8 @@ def techs_selected(request, model=None, id=None):
             # append akvopedia articles if checked.
             THIS_PATH=os.path.dirname(__file__)
             (HOME,HERE)=os.path.split(THIS_PATH)
-            akvopedia_pdf_dir=HOME+'/mediaroot/akvopedia_pdf/'
-            output_dir=HOME+'/mediaroot/pdf_tmp/'
+            akvopedia_pdf_dir= settings.STATIC_ROOT + '/akvopedia_pdf/'
+            output_dir=settings.STATIC_ROOT + '/pdf_tmp/'
                
             output = PdfFileWriter()
             outputStream = file(output_dir+s_name_final, "wb")
@@ -496,20 +498,17 @@ def choose_meta(request, criterion_id):
 def technologies_help(request,id=None):
     # Needs to be refined to filter on selection
     #
-    
     #user_id = request.session['auth_user_id']
     session = get_session(request)
         
     technology = get_object_or_404(Technology, pk=id)
     applicable = technology.applicable(session)
     relevancy_objects = []
-    
     if applicable == technology.TECH_USE_MAYBE:
         relevancy_objects = technology.maybe_relevant(session)
 
     elif applicable == technology.TECH_USE_NO:
         relevancy_objects = technology.not_relevant(session)
-    
     return { 'technology': technology, 'relevancy_objects':relevancy_objects, 'settings': settings}
 
 

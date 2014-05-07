@@ -1,9 +1,10 @@
 {% extends "dst/base.html" %}
 {% load i18n  %}
+{% load staticfiles %}
 {% block content %}
 <div class="span-3 append-2 last">
 <p class="small" style="margin-top:15px;margin-bottom:0"> <a class="blue_w awesome" style="margin-right:10px; float:right;"
-				href="{% url technologies %}">{% trans 'To the tool &rarr;' %}</a>
+				href="{% url "technologies" %}">{% trans 'To the tool &rarr;' %}</a>
 </p>
 </div>
 
@@ -11,7 +12,7 @@
 	<div class="frame" style="background-color:#EEF8FA">
 		<div class="space15">
 			<h3>Introduction</h3>
-			<p>Investing in adequate sanitation and hygiene is one of the most effective ways to improve the health and living conditions of people, especially in poor urban and peri-urban areas. However, one of the problems is the limited knowledge and awareness about sustainable and affordable options. This <a href="{% url technologies %}">Sanitation Decision Support Tool</a> helps you explore sanitation systems, based on your own situation. </p>
+			<p>Investing in adequate sanitation and hygiene is one of the most effective ways to improve the health and living conditions of people, especially in poor urban and peri-urban areas. However, one of the problems is the limited knowledge and awareness about sustainable and affordable options. This <a href="{% url "technologies" %}">Sanitation Decision Support Tool</a> helps you explore sanitation systems, based on your own situation. </p>
 		</div>
 	</div>
 </div>
@@ -36,13 +37,13 @@ Once you are happy with your selection, click 'Continue with selected technologi
 
 <div class="push-1 span-4 first">
 	<p style="margin-bottom:4px;">Choosing options </p>
-	<img style="margin-left:20px;" src="{{MEDIA_URL}}img/extra/options.png" alt="selecting options" />
+	<img style="margin-left:20px;" src="{% static "img/extra/options.png" %}" alt="selecting options" />
 	<p style="margin-bottom:4px; margin-top:10px;">Display of results </p>
-	<img style="margin-left:20px;" src="{{MEDIA_URL}}img/extra/techs.png" alt="technologies" />
+	<img style="margin-left:20px;" src="{% static "img/extra/techs.png" %}" alt="technologies" />
 	<p style="margin-bottom:4px;margin-top:10px;">Making a selection </p>
-	<img style="margin-left:20px;" src="{{MEDIA_URL}}img/extra/selection.png" alt="selecting technologies" />
+	<img style="margin-left:20px;" src="{% static "img/extra/selection.png" %}" alt="selecting technologies" />
 	<p style="margin-bottom:4px;margin-top:10px;">Creating a pdf</p>
-	<img style="margin-left:20px;" src="{{MEDIA_URL}}img/extra/pdf.png" alt="creating pdf" />
+	<img style="margin-left:20px;" src="{% static "img/extra/pdf.png" %}" alt="creating pdf" />
 </div>
 
 <div class="push-1 span-11 first">
@@ -65,10 +66,10 @@ To learn more about putting together complete sanitation systems that deal with 
 
 <div class="push-1 span-4 first">
 	<p style="margin-bottom:4px;">A complete sanitation system, from the publication below </p>
-	<a href="http://www.eawag.ch/forschung/sandec/publikationen/compendium_e/index_EN"><img style="margin-left:20px;" src="{{MEDIA_URL}}img/extra/diag.png" alt="selecting options" /></a>
+	<a href="http://www.eawag.ch/forschung/sandec/publikationen/compendium_e/index_EN"><img style="margin-left:20px;" src="{% static "img/extra/diag.png" %}" alt="selecting options" /></a>
 	
 	<p style="margin-bottom:4px;margin-top:10px">Recommended reading </p>
-	<a href="http://www.eawag.ch/forschung/sandec/publikationen/compendium_e/index_EN"><img style="margin-left:20px;" src="{{MEDIA_URL}}img/extra/compendium.png" alt="selecting options" /></a>
+	<a href="http://www.eawag.ch/forschung/sandec/publikationen/compendium_e/index_EN"><img style="margin-left:20px;" src="{% static "img/extra/compendium.png" %}" alt="selecting options" /></a>
 </div>
 
 
@@ -83,17 +84,17 @@ To learn more about putting together complete sanitation systems that deal with 
 <p>We would like to add additional functionality to this tool, such as the capability to construct complete systems, and saving and retrieving of results. If we are able to add these functions will depend on further funding. </p>
 			
 <p><strong>Comments and suggestions</strong></br>
-We would like to hear from you! Comments and suggestions about the tool can be send to m.t.westra<img src="{{MEDIA_URL}}img/extra/at.png"/>akvo.org</p>
+We would like to hear from you! Comments and suggestions about the tool can be send to m.t.westra<img src="{% static "img/extra/at.png" %}"/>akvo.org</p>
 		</div>
 	</div>
 </div>
 <div class="push-1 span-4 last">	
 			<p style="margin-bottom:4px;">Realised by: </p>
 			<a href="http://www.akvo.org">
-				<img src="{{MEDIA_URL}}img/logos/logo_akvo.png" alt="Akvo" />
+				<img src="{% static "img/logos/logo_akvo.png" %}" alt="Akvo" />
 			</a>
 			<a href="http://www.waste.nl/">
-				<img src="{{MEDIA_URL}}img/logos/logo_waste.jpg" alt="Waste" />
+				<img src="{% static "img/logos/logo_waste.jpg" %}" alt="Waste" />
 			</a>
 </div>	
 
@@ -105,23 +106,23 @@ We would like to hear from you! Comments and suggestions about the tool can be s
 <div class="push-1 span-5 last">			
 			<h4>{% trans 'As a part of the ROSA project' %}:</h4>
 			<a href="http://rosa.boku.ac.at/">
-				<img src="{{MEDIA_URL}}img/logos/logo_rosa.png" width="150" height="90" alt="Rosa" />
+				<img src="{% static "img/logos/logo_rosa.png" %}" width="150" height="90" alt="Rosa" />
 			</a>
 </div>			
 <div class="push-1 span-5 last">			
 			<h4>{% trans 'Financial support by' %}:</h4>
 			<a href="http://www.minbuza.nl/">
-				<img src="{{MEDIA_URL}}img/logos/logo_rijksoverheid.gif" alt="Rijksoverheid" />
+				<img src="{% static "img/logos/logo_rijksoverheid.gif" %}" alt="Rijksoverheid" />
 			</a>
 			<a href="http://ec.europa.eu/research/fp6/">
-				<img src="{{MEDIA_URL}}img/logos/logo_fp6.png" alt="EU 6th Freamework programme" />
+				<img src="{% static "img/logos/logo_fp6.png" %}" alt="EU 6th Freamework programme" />
 			</a>
 </div>			
 	
 		{% comment %}
 		<h2>Help</h2>
-		- <a href="{% url help %}" class="fancy">Why use the tool?</a><br><br />
-		- <a href="{% url demo %}" class="fancy">Demonstration</a>
+		- <a href="{% url "help" %}" class="fancy">Why use the tool?</a><br><br />
+		- <a href="{% url "demo" %}" class="fancy">Demonstration</a>
 		{% endcomment %}
 	</div>
 

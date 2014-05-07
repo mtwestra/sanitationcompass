@@ -11,13 +11,13 @@ from django import forms
 
 import itertools
 import logging
-from utils import pretty_name
+from django.forms.forms import pretty_name
 
 # PROFILING  
 import hotshot
 import os
 import time
-import settings
+from django.conf import settings
 
 try:
     PROFILE_LOG_BASE = settings.PROFILE_LOG_BASE
@@ -69,6 +69,8 @@ class Factor(models.Model):
     order           = models.IntegerField(_(u'order'),)
     info_heading    = models.CharField(_(u'info heading'), max_length=50)
     info_text       = models.TextField(_(u'info text'),)
+    is_meta_factor  = models.BooleanField(verbose_name=_('This is a meta factor'))
+    meta_criterion  = models.ManyToManyField('Criterion', blank=True, related_name='factors', symmetrical=False, )
 
     def __unicode__(self):
         return self.factor
@@ -162,7 +164,7 @@ class Technology(models.Model):
     #input       = models.ManyToManyField('self', blank=True, related_name='output', symmetrical=False, )
     output      = models.ManyToManyField('self', blank=True, related_name='input', symmetrical=False, )
     image       = models.CharField(_(u'image'), max_length=100)
-    url         = models.URLField(blank=True, verify_exists = False, help_text=_('Enter the url to the corresponding Akvopedia entry, beginning with http://.'))
+    url         = models.URLField(blank=True, help_text=_('Enter the url to the corresponding Akvopedia entry, beginning with http://.'))
     linked_techs = models.ManyToManyField('self',blank=True, related_name='linked_tech',symmetrical=True)
     order       =  models.IntegerField(null=True)
     

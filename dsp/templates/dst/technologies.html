@@ -1,6 +1,6 @@
 {% extends "dst/base.html" %}
 {% load i18n akvo_filters %}
-
+{% load staticfiles %}
 {% block inline_styles %}
 {{block.super}}
 
@@ -27,12 +27,12 @@
 
 <div class="span-6 last">
 <p class="small" style="margin-top:15px;margin-bottom:0;"> <a class="blue_w awesome" style="margin-right:10px; float:right;"
-				href="{% url techs_selected %}">{% trans 'Continue with selected technologies &rarr;' %}</a>
+				href="{% url "techs_selected" %}">{% trans 'Continue with selected technologies &rarr;' %}</a>
 </p>
 </div>
 <!-- form stuff begin -->
 
-<form name="factorform" method="post">
+<form name="factorform" method="post">{% csrf_token %}
 {{ formset.management_form }}    
 
 <div class="span-18">
@@ -40,30 +40,48 @@
 	    <div style="padding:0 10px 0 20px;">
 		<p style="text-align:left;">
 			<a class="blue_w awesome" style="margin-right:10px; margin-bottom:5px; "
-				href="{% url index %}">&larr;{% trans 'Back to introduction' %}</a>
+				href="{% url "index" %}">&larr;{% trans 'Back to introduction' %}</a>
 		</p>
 		<p class="small"> Use the options below to describe your situation. Click on the items for more help. </p>
-		<p style="text-align:left;">
+		<!--<p style="text-align:left;">
 			<a class="blue_w awesome" style="margin-right:10px; margin-bottom:5px; float:left;"
-				href="{% url reset_all %}">{% trans 'Reset options' %}</a>
-		</p>
+				href="{% url "reset_all" %}">{% trans 'Reset options' %}</a>
+		</p> -->
 	    </div>
 	<!-- create left sidebar with questions -->
 	    <div style="padding:0 10px 0 20px;">
 		{% for form, factor, change in zipped_formlist %}
-		{% if change %}
+		  {%if form.meta_factor%}
+ 			<p style="text-align:left;">
+            <a class="green awesome" style="margin-right:10px; margin-bottom:5px; float:left;"
+                href="{% url "choose_meta" form.instance.criterion.id %}">
+                {%if form.applicable.value%}
+                  <strong>{{form.instance.criterion|capfirst}}</strong>
+                {%else%}
+                  <span style="color:#618d00">{{form.instance.criterion|capfirst}}</span>
+                {%endif%}
+            </a>
+         	</p>
+			<div style="display:none">{{form.id}}{{form.criterion}}{{form.applicable}}</div>
+
+		  {%else%}
+		  {% if change %}
 		    {% if not forloop.first %}
 		    </ul>
-                {% endif %}
+            {% endif %}
 		    <hr style="margin-bottom:0.5em;"/>
-		    <h5><a href="{% url factor_help 'factor' factor.id %}" class="fancy">{{factor.factor|capfirst}}</a></h5>
+		    <h5><a href="{% url "factor_help" 'factor' factor.id %}" class="fancy">{{factor.factor|capfirst}}</a></h5>
 		    <ul style="list-style-type:none;">
-		{% endif %}
+		  {% endif %}
 
 		    <li>
 		   {{form.id}}{{form.criterion}}{{form.applicable}}
-		    <a class="small_choices fancy" href="{% url factor_help 'criterion' form.instance.criterion.id %}" target="_blank">{{form.instance.criterion|capfirst}}</a>
+		    <a class="small_choices fancy" href="{% url "factor_help" 'criterion' form.instance.criterion.id %}" target="_blank">{{form.instance.criterion|capfirst}}</a>
 		</li>
+	  {%endif%}
+
+
+
 		{% endfor %}
 		<hr />
 		</ul>
@@ -90,23 +108,23 @@
 	<div class="span-14 last" style="margin-bottom:0; background:#ddd;">
 	    {% for techgroup, techs in all_techs %}
 		<div class="span-2b {% if forloop.first %}first{% endif %} {% if forloop.last %}last{% endif %}" style="text-align:center;">	
-		    <div class="tech_top" style="background-image: url('{{ MEDIA_URL}}img/extra/please_select.gif'); background-repeat: no-repeat; background-position: 50% 50%; ">
+		    <div class="tech_top please_select">
 		    {% for tech in techs %}
 			{% ifequal tech.usable 'chosen'%}
 			<div style="background:#fff;">
 			       <div>	
-				    <a class="fancy" href="{% url technologies_help tech.id %}" title="{{tech}}">
+				    <a class="fancy" href="{% url "technologies_help" tech.id %}" title="{{tech}}">
 				    <div style="margin-bottom:5px;">
-						<img src="{{ MEDIA_URL}}small/{{ tech.image }}""/>		
+						<img src="/static/small/{{ tech.image }}"/>		
 				    </div>
 				    </a>
 				    <p class="tiny" style="margin-top:5px; display:block; height:35px; overflow:hidden; margin-bottom:5px;">
-				        <a class="fancy" href="{% url technologies_help tech.id %}" title="{{tech.id}}">{{ tech|capfirst|smart_truncate:25 }}</a>
+				        <a class="fancy" href="{% url "technologies_help" tech.id %}" title="{{tech.id}}">{{ tech|capfirst|smart_truncate:25 }}</a>
 				    </p>	                    
 				</div>
 			    </div>
 			       <div style="margin-top:0px;">
-				    <a class="small" style="color:#666;" href="{% url tech_choice tech.id %}"> <img src="{{ MEDIA_URL}}img/extra/minus.gif">   {% trans 'remove' %}</a>
+				    <a class="small" style="color:#666;" href="{% url "tech_choice" tech.id %}"> <img src="{% static "img/extra/minus.gif" %}">   {% trans 'remove' %}</a>
 			       </div>
 			{% endifequal %}
 		    {% endfor %}
@@ -114,7 +132,7 @@
 		</div>
 		  {% if not forloop.last %}
 		    <div style="margin-top:30px;margin-left:12px;float:left;">
-			<img src="{{ MEDIA_URL}}img/extra/arrow.gif"> 
+			<img src="{% static "img/extra/arrow.gif" %}"> 
 		    </div>
 		    {% endif %}
 	    {% endfor %}
@@ -149,22 +167,22 @@
 		{% for tech in techs %}
 		<div class="tech tech_{{tech.usable}}">
 		    <div class="back_{{tech.usable}}">	
-					<a class="fancy" href="{% url technologies_help tech.id %}" title="{{tech}}">
+					<a class="fancy" href="{% url "technologies_help" tech.id %}" title="{{tech}}">
 		        <div class="back_{{tech.usable}}_img" style="margin-bottom:5px;">
-						<img src="{{ MEDIA_URL}}{{ tech.image }}" />		
+						<img src="/static/{{tech.image}}" />		
 		        </div>
 		    			</a>
 		    			<p class="small" style="margin-top:5px; display:block; height:35px; overflow:hidden; margin-bottom:5px;">
-		    			<a class="fancy" href="{% url technologies_help tech.id %}" title="{{tech.id}}">{{ tech|capfirst|smart_truncate:25 }}</a>
+		    			<a class="fancy" href="{% url "technologies_help" tech.id %}" title="{{tech.id}}">{{ tech|capfirst|smart_truncate:25 }}</a>
 		    			</p>
 		    			
 		    			
 		    			{% ifequal tech.usable 'chosen'  %}
-		    				<a class="white awesome small" href="{% url tech_choice tech.id %}">{% trans 'Deselect' %}</a>
+		    				<a class="white awesome small" href="{% url "tech_choice" tech.id %}">{% trans 'Deselect' %}</a>
 		    			{% else %}
 		    				{% ifnotequal tech.usable 'no' %}
 		    					{% ifnotequal tech.usable 'hide' %}
-		    						<a class="white awesome small" href="{% url tech_choice tech.id %}">{% trans 'Select' %}</a>
+		    						<a class="white awesome small" href="{% url "tech_choice" tech.id %}">{% trans 'Select' %}</a>
 		    					{% endifnotequal %}
 		    				{% endifnotequal %}
 		    			{% endifequal %}
@@ -208,13 +226,13 @@
 
 <div class="span-18">
 	<div class="push-1 span-3 first">
-		<a class="aqua awesome" style="margin-right:10px; float:left;" href="{% url factors %}">{% trans '&larr; Back' %}</a>	
+		<a class="aqua awesome" style="margin-right:10px; float:left;" href="{% url "factors" %}">{% trans '&larr; Back' %}</a>	
 	</div>
 	<div class="span-10" style="text-align:center;">
 		&nbsp;
 	</div>
 	<div class="span-3 append-1 last">
-		<a class="aqua awesome" href="{% url solution %}" onclick="this.blur();" style="margin-left:10px; float:right;">{% trans 'Continue &rarr;' %}</a>
+		<a class="aqua awesome" href="{% url "solution" %}" onclick="this.blur();" style="margin-left:10px; float:right;">{% trans 'Continue &rarr;' %}</a>
 	</div>
 </div>
 
@@ -222,7 +240,7 @@
 
 {% block js %}
 {{block.super}}
-<script type="text/javascript" src="{{MEDIA_URL}}fancybox/fancybox.js"></script>
+<script type="text/javascript" src="{% static "fancybox/fancybox.js" %}"></script>
 {% endblock js %}
 
 
@@ -238,7 +256,7 @@ jQ('#toggle_yes').click(function () {
 		jQ(this).html('Hide applicable');
 		jQ('.tech_yes').fadeIn("slow");
 	}
-	jQ.post('{% url toggle_button 'yes_ishidden' %}');	
+	jQ.post('{% url "toggle_button" 'yes_ishidden' %}');	
 });
 
 jQ('#toggle_maybe').click(function () {
@@ -249,7 +267,7 @@ jQ('#toggle_maybe').click(function () {
 		jQ(this).html('Hide maybe');
 		jQ('.tech_maybe').fadeIn("slow");
 	}
-	jQ.post('{% url toggle_button 'maybe_ishidden' %}');
+	jQ.post('{% url "toggle_button" 'maybe_ishidden' %}');
 });
 
 jQ('#toggle_no').click(function () {
@@ -261,7 +279,7 @@ jQ('#toggle_no').click(function () {
 		jQ(this).html( 'Hide unsuitable' )
 		jQ('.tech_no').fadeIn("slow");
 	}
-	jQ.post('{% url toggle_button 'no_ishidden' %}');
+	jQ.post('{% url "toggle_button" 'no_ishidden' %}');
 });
 
 jQ('#toggle_na').click(function () {
@@ -273,7 +291,7 @@ jQ('#toggle_na').click(function () {
 		jQ(this).html( 'Hide applicable' )
 		jQ('.tech_na').fadeIn("slow");
 	}
-	jQ.post('{% url toggle_button 'na_ishidden' %}');
+	jQ.post('{% url "toggle_button" 'na_ishidden' %}');
 });
 
 jQ('#toggle_hide').click(function () {
@@ -285,7 +303,7 @@ jQ('#toggle_hide').click(function () {
 		jQ(this).html( 'Hide excluded' )
 		jQ('.tech_hide').fadeIn("slow");
 	}
-	jQ.post('{% url toggle_button 'hide_ishidden' %}');
+	jQ.post('{% url "toggle_button" 'hide_ishidden' %}');
 });
 
 
@@ -298,7 +316,7 @@ jQ('#toggle_page_intro').click(function() {
 		jQ('#page_intro_text').slideDown("slow");
 		jQ('#toggle_page_intro').html('Hide help');
 	}
-	jQ.post('{% url toggle_button 'tech_help_ishidden' %}');
+	jQ.post('{% url "toggle_button" 'tech_help_ishidden' %}');
 });
 
 

@@ -6,6 +6,8 @@ import time
 import datetime
 import logging
 
+from django.conf import settings
+
 from reportlab.platypus import *
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.rl_config import defaultPageSize
@@ -44,7 +46,7 @@ def create_PDF_selected_techs(all_chosen_techs,zipped_answerlist,incl_selected,i
     
     THIS_PATH=os.path.dirname(__file__)
     (HOME,HERE)=os.path.split(THIS_PATH)
-    tmp_dir=HOME+'/mediaroot/pdf_tmp/'
+    tmp_dir=settings.STATIC_ROOT + '/pdf_tmp/'
        
     PAGE_HEIGHT=defaultPageSize[1]
     PAGE_WIDTH=defaultPageSize[0]
@@ -70,8 +72,7 @@ def create_PDF_selected_techs(all_chosen_techs,zipped_answerlist,incl_selected,i
         
         THIS_PATH=os.path.dirname(__file__)
         (HOME,HERE)=os.path.split(THIS_PATH)
-        MEDIA_PATH=HOME+'/mediaroot/img/logos/'
-        pic1=os.path.join(MEDIA_PATH,'akvo_logo_white.png')
+        pic1=settings.STATIC_ROOT + '/img/logos/akvo_logo_white.png'
         canvas.drawImage(pic1,16*cm, 26*cm)
         
         LEADING=0.5*cm
@@ -172,7 +173,7 @@ def create_PDF_selected_techs(all_chosen_techs,zipped_answerlist,incl_selected,i
         if incl_selected:
             THIS_PATH=os.path.dirname(__file__)
             (HOME,HERE)=os.path.split(THIS_PATH)
-            MEDIA_PATH=HOME+'/mediaroot/techs_white/'
+            MEDIA_PATH=settings.STATIC_ROOT + '/techs_white/'
     
             styles.add(ParagraphStyle(name='smallfont', fontName='Helvetica',fontSize=8))
             smallfont=styles["smallfont"]
@@ -259,7 +260,7 @@ def create_PDF_selected_techs(all_chosen_techs,zipped_answerlist,incl_selected,i
     if incl_short_expl:
         header("Short descriptions")
     
-        styles.add(ParagraphStyle(name='tech_header', fontName='Helvetica',fontSize=14))
+        styles.add(ParagraphStyle(name='tech_header', fontName='Helvetica',fontSize=14, leftIndent=4*cm))
         tech_header=styles["tech_header"]
     
         styles.add(ParagraphStyle(name='indent_left', fontName='Helvetica',leftIndent=4*cm))
@@ -267,7 +268,7 @@ def create_PDF_selected_techs(all_chosen_techs,zipped_answerlist,incl_selected,i
     
         THIS_PATH=os.path.dirname(__file__)
         (HOME,HERE)=os.path.split(THIS_PATH)
-        MEDIA_PATH=HOME+'/mediaroot/techs_white/'
+        MEDIA_PATH=settings.STATIC_ROOT + '/techs_white/'
         
         for group, tech, relevance_objects in all_chosen_techs:
              if not tech=='':

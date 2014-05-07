@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.core.urlresolvers import reverse
 from django.db.models import get_model
+from django.db.models import Q
 from django.forms import ModelForm
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
@@ -13,14 +14,14 @@ from datetime import datetime
 from pyPdf import PdfFileWriter, PdfFileReader
 
 from models import Factor, TechGroup, Technology, Relevancy, Answer, Criterion, TechChoice, PDF_prefs
-from utils import pretty_name
+from django.forms.forms import pretty_name
 from pdf_utils import *
 
 # PROFILING  
 import hotshot
 import os
 import time
-import settings
+from django.conf import settings
 
 try:
     PROFILE_LOG_BASE = settings.PROFILE_LOG_BASE
@@ -108,10 +109,10 @@ def index(request):
         return {}
 
 def get_or_create_answers(session):
-    answers = Answer.objects.filter(session=session)
-    if not answers.count():
-        criteria = Criterion.objects.all()
-        for criterion in criteria:
+    criteria = Criterion.objects.all()
+    for criterion in criteria:
+        ans = Answer.objects.filter(session=session,criterion=criterion)
+        if not ans.count():
             Answer.objects.create(session=session, criterion=criterion, applicable=False)
     return Answer.objects.filter(session=session).order_by('criterion__factor__order', 'criterion__order')
 
@@ -154,6 +155,8 @@ def init_session(session):
  #  initialize_linked_techs()
     btns = [getattr(Technology, use) for use in uses]
     buttons = ["%s_ishidden" % btn for btn in btns ]
+    if 'no_ishidden' not in session.keys():
+        session['no_ishidden'] = True
     for button in buttons:
         if button not in session.keys():
             session[button] = False
@@ -235,20 +238,31 @@ def technologies(request, model=None, id=None):
             formset.save()   
     
     #if there are no valid answers, we just default to false
-    qs = get_or_create_answers(get_session(request))
+    get_or_create_answers(get_session(request))
+ 
+   # get the active meta factor
+    crit = None
+    meta_answers = Answer.objects.filter(session=get_session(request),criterion__factor__is_meta_factor=True)
+    for ans in meta_answers:
+        if ans.applicable:
+            crit = ans.criterion
+
+    qs_filtered = Answer.objects.filter(session=get_session(request)).filter(Q(criterion__factor__meta_criterion=crit) | Q(criterion__factor__is_meta_factor=True)).order_by('criterion__factor__order', 'criterion__order')
+
+    formset = AnswerFormSet(queryset=qs_filtered)
     
-    formset = AnswerFormSet(queryset=qs)
     form_list = [form for form in formset.forms]
     change_list = []
     factor_list = []
     old_factor = ''
-    
+
     # the 'change' variable is used to detect when we need to display a new factor. The form list is just a list of all criteria.
     for form in formset.forms:
         new_factor = form.instance.criterion.factor
         factor_list.append(new_factor)
         change_list.append(new_factor != old_factor)
         form.fields['applicable'].label = pretty_name(str(form.instance.criterion))
+        form.meta_factor = form.instance.criterion.factor.is_meta_factor
         old_factor = new_factor
     
     # create zipped list of forms, factors and change. Each form is one criterium.
@@ -284,8 +298,10 @@ def technologies(request, model=None, id=None):
 
 def pdf(request, filename):
     logging.debug('------------------------path -----')
-    
-    fullpath = os.path.join(settings.PDF_PATH, filename)
+    print filename
+    #fullpath = os.path.join(settings.PDF_PATH, filename)
+    fullpath = settings.PDF_PATH + filename
+    print fullpath
     logging.debug('------------------------path -----'+fullpath)
     response = HttpResponse(file(fullpath).read())
     response['Content-Type'] = 'application/pdf'
@@ -390,8 +406,8 @@ def techs_selected(request, model=None, id=None):
             # append akvopedia articles if checked.
             THIS_PATH=os.path.dirname(__file__)
             (HOME,HERE)=os.path.split(THIS_PATH)
-            akvopedia_pdf_dir=HOME+'/mediaroot/akvopedia_pdf/'
-            output_dir=HOME+'/mediaroot/pdf_tmp/'
+            akvopedia_pdf_dir= settings.STATIC_ROOT + '/akvopedia_pdf/'
+            output_dir=settings.STATIC_ROOT + '/pdf_tmp/'
                
             output = PdfFileWriter()
             outputStream = file(output_dir+s_name_final, "wb")
@@ -463,25 +479,36 @@ def reset_techs(request):
     TechChoice.objects.filter(session=get_session(request)).delete()
     return HttpResponseRedirect(reverse('technologies'))
 
+def choose_meta(request, criterion_id):
+    criterion = Criterion.objects.get(id=criterion_id)
+    all_answers = Answer.objects.filter(session=get_session(request))
+    meta_answer = Answer.objects.filter(session=get_session(request),criterion=criterion)
+
+    for ans in all_answers:
+        ans.applicable = False
+        ans.save()
+
+    for ans in meta_answer: 
+        ans.applicable = True
+        ans.save()
+    return HttpResponseRedirect(reverse('technologies'))
+ 
 
 @render_to('dst/technologies_help.html')
 def technologies_help(request,id=None):
     # Needs to be refined to filter on selection
     #
-    
     #user_id = request.session['auth_user_id']
     session = get_session(request)
         
     technology = get_object_or_404(Technology, pk=id)
     applicable = technology.applicable(session)
     relevancy_objects = []
-    
     if applicable == technology.TECH_USE_MAYBE:
         relevancy_objects = technology.maybe_relevant(session)
 
     elif applicable == technology.TECH_USE_NO:
         relevancy_objects = technology.not_relevant(session)
-    
     return { 'technology': technology, 'relevancy_objects':relevancy_objects, 'settings': settings}
 
 

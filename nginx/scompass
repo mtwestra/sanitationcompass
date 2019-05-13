@@ -34,7 +34,7 @@ server {
 
   location / {
     include proxy_params;
-    return 301 http://sanitationcompass.info/technologies;
+    return 301 https://sanitationcompass.info/technologies;
   }
 
   location /technologies {

@@ -1,0 +1,15 @@
+[Unit]
+Description=gunicorn daemon
+Requires=gunicorn.socket
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/sanitationcompass/scompass
+EnvironmentFile=/home/ubuntu/sanitationcompass/env
+Environment="PATH=/home/ubuntu/sanitationcompass/venv/bin"
+ExecStart=/home/ubuntu/sanitationcompass/venv/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/ubuntu/sanitationcompass/scompass.sock scompass.wsgi:application -e DJANGO_DEBUG=${DJANGO_DEBUG} -e DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+
+[Install]
+WantedBy=multi-user.target

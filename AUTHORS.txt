@@ -1,4 +1,4 @@
-AUTHORS.txt v1.0, 24 May 2010, tbp 
+AUTHORS.txt v1.0, 24 May 2019, tbp 
 
 AUTHORS of Akvo / WASTE Decision Support Tool (DST)
 
@@ -24,4 +24,3 @@ Funding partners, without them Akvo / WASTE DST could not have happened
 - Resource Oriented Sanitation (ROSA)
 - EU 6th Framework Programme
 - Dutch Ministry of Foreign Affairs
-

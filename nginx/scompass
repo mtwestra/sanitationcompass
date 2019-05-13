@@ -1,0 +1,44 @@
+server {
+    listen 80;
+
+    # Listen to your server ip address
+    server_name 3.120.62.237;
+
+    # Redirect all traffic comming from your-server-ip to your domain
+    return 301 https://sanitationcompass.info$request_uri;
+}
+
+server {
+  listen 80 default_server;
+  listen [::]:80 default_server;
+  server_name sanitationcompass.info www.sanitationcompass.info;
+  root /usr/share/nginx/html;
+
+  if ($scheme != "https") {
+    return 301 https://$host$request_uri;
+  }
+}
+
+server {
+  listen 443 ssl http2 default_server;
+  listen [::]:443 ssl http2 default_server;
+  server_name sanitationcompass.info www.sanitationcompass.info;
+
+	ssl_certificate /etc/letsencrypt/live/sanitationcompass.info/fullchain.pem;
+	ssl_certificate_key /etc/letsencrypt/live/sanitationcompass.info/privkey.pem;
+	include /etc/letsencrypt/options-ssl-nginx.conf;
+
+  location /static/ {
+    root /home/ubuntu/sanitationcompass/scompass;
+  }
+
+  location / {
+    include proxy_params;
+    return 301 http://sanitationcompass.info/technologies;
+  }
+
+  location /technologies {
+    include proxy_params;
+    proxy_pass http://unix:/run/gunicorn.sock;
+  }
+}

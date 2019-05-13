@@ -197,19 +197,18 @@ def technologies(request, model=None, id=None):
             formset.save()
 
     #if there are no valid answers, we just default to false
-    get_or_create_answers(get_session(request))
+    qs = get_or_create_answers(get_session(request))
 
    # get the active meta factor
-    crit = None
-    meta_answers = Answer.objects.filter(session=get_session(request),criterion__factor__is_meta_factor=True)
-    for ans in meta_answers:
-        if ans.applicable:
-            crit = ans.criterion
+    # crit = None
+    # meta_answers = Answer.objects.filter(session=get_session(request),criterion__factor__is_meta_factor=True)
+    # for ans in meta_answers:
+    #     if ans.applicable:
+    #         crit = ans.criterion
+    #
+    # qs_filtered = Answer.objects.filter(session=get_session(request)).filter(Q(criterion__factor__meta_criterion=crit) | Q(criterion__factor__is_meta_factor=True)).order_by('criterion__factor__order', 'criterion__order')
 
-    qs_filtered = Answer.objects.filter(session=get_session(request)).filter(Q(criterion__factor__meta_criterion=crit) | Q(criterion__factor__is_meta_factor=True)).order_by('criterion__factor__order', 'criterion__order')
-
-    formset = AnswerFormSet(queryset=qs_filtered)
-
+    formset = AnswerFormSet(queryset=qs)
     form_list = [form for form in formset.forms]
     change_list = []
     factor_list = []
@@ -221,7 +220,7 @@ def technologies(request, model=None, id=None):
         factor_list.append(new_factor)
         change_list.append(new_factor != old_factor)
         form.fields['applicable'].label = pretty_name(str(form.instance.criterion))
-        form.meta_factor = form.instance.criterion.factor.is_meta_factor
+        # form.meta_factor = form.instance.criterion.factor.is_meta_factor
         old_factor = new_factor
 
     # create zipped list of forms, factors and change. Each form is one criterium.
@@ -436,19 +435,19 @@ def reset_techs(request):
     TechChoice.objects.filter(session=get_session(request)).delete()
     return HttpResponseRedirect(reverse('technologies'))
 
-def choose_meta(request, criterion_id):
-    criterion = Criterion.objects.get(id=criterion_id)
-    all_answers = Answer.objects.filter(session=get_session(request))
-    meta_answer = Answer.objects.filter(session=get_session(request),criterion=criterion)
-
-    for ans in all_answers:
-        ans.applicable = False
-        ans.save()
-
-    for ans in meta_answer:
-        ans.applicable = True
-        ans.save()
-    return HttpResponseRedirect(reverse('technologies'))
+# def choose_meta(request, criterion_id):
+#     criterion = Criterion.objects.get(id=criterion_id)
+#     all_answers = Answer.objects.filter(session=get_session(request))
+#     meta_answer = Answer.objects.filter(session=get_session(request),criterion=criterion)
+#
+#     for ans in all_answers:
+#         ans.applicable = False
+#         ans.save()
+#
+#     for ans in meta_answer:
+#         ans.applicable = True
+#         ans.save()
+#     return HttpResponseRedirect(reverse('technologies'))
 
 
 @render_to('comp/technologies_help.html')

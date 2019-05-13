@@ -3,3 +3,4 @@
 *.log
 *.kpf
 /venv/*
+/scompass/comp/__pycache__/*

@@ -5,6 +5,7 @@ from django import forms
 from django.db.models.query import QuerySet
 from django.db.models.signals import post_save, post_delete
 from django.contrib.admin.models import LogEntry
+from django.forms.forms import pretty_name
 from django.conf import settings
 
 class Factor(models.Model):

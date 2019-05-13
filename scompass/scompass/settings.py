@@ -26,7 +26,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'cg#p$g+j9tax!#a3cup@1$8obt2_+&
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
 # TODO get right IP address
-ALLOWED_HOSTS = ['3.120.62.237','sanitationcompass.info','127.0.0.1']
+ALLOWED_HOSTS = ['18.195.104.88','sanitationcompass.info','www.sanitationcompass.info']
 
 
 # Application definition

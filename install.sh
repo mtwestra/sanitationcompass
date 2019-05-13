@@ -38,7 +38,6 @@ sudo rm /etc/nginx/sites-enabled/default
 sudo rm /etc/nginx/sites-enabled/scompass
 sudo ln -s /etc/nginx/sites-available/scompass /etc/nginx/sites-enabled/scompass
 
-
 # test configuration with:
 # sudo nginx -t
 

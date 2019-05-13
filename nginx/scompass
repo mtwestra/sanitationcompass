@@ -2,7 +2,7 @@ server {
     listen 80;
 
     # Listen to your server ip address
-    server_name 3.120.62.237;
+    server_name 18.195.104.88;
 
     # Redirect all traffic comming from your-server-ip to your domain
     return 301 https://sanitationcompass.info$request_uri;
